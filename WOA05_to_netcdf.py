@@ -20,14 +20,33 @@ def parseCommandLine():
       metavar='NETCDF_FILE',
       help='''netCDF file to construct.''')
   cla = parser.parse_args()
-  readAsciiWriteNetcdf(cla.inFile, cla.outFile)
+  data = readAscii(cla.inFile)
 
-def readAsciiWriteNetcdf(inFile, outFile):
+def readAscii(inFile):
   """
   Reads the ascii file format and constructs a netcdf file with the same data.
   """
-  print inFile, outFile
+  N = 180*360*33 # Largest size of dataset in WOA05
+  data = numpy.zeros(N)
+  n = 0
+  for line in open(inFile, 'r'):
+    s = 0
+    while s<80:
+      data[n] = float(line[s:s+8])
+      n += 1
+      s += 8
+    print '\rRead %i/%i (%.2f%%)'%(n,N,100.*n/N),'from',inFile,
+  nk = n/(360*180)
+  print ' ...',nk,'levels read'
+  data = data.reshape((33,180,360))
+  return data[:nk] # Removes unfilled levels
+
+def writeNetcdf(outFile, data):
+  """
+  Writes data to a 1x1x33 grid netcdf file.
+  """
+  print outFile, data.shape
+  print data[0]
 
 # Invoke parseCommandLine(), the top-level prodedure
 if __name__ == '__main__': parseCommandLine()
-
