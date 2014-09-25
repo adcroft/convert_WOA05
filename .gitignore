@@ -1,2 +1,6 @@
+# Download climatology files
 *.tar
+# Unpacked ascii climatology files
 ascii
+# Converted netcdf files
+netcdf
