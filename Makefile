@@ -12,10 +12,11 @@ TP = 00 01 02 03 04 05 06 07 08 09 10 11 12
 FT = an
 G = 1
 
-all: ascii.md5sums netcdf_files
+all: ascii.md5sums netcdf.md5sums
 
 # Rules to create netcdf files
-netcdf_files: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), netcdf/$(v)$(tp)$(ft)$(G).nc ) ) )
+netcdf.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), netcdf/$(v)$(tp)$(ft)$(G).nc ) ) )
+	(cd netcdf; ../ncmd5.py *.nc) > $@
 
 # Rule to convert an ascii file into a netcdf file
 netcdf/%.nc: ascii/%
