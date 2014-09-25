@@ -12,6 +12,9 @@ TP = 00 01 02 03 04 05 06 07 08 09 10 11 12
 FT = an
 G = 1
 
+SW = seawater-3.3.2
+GSW = gsw-3.0.3
+
 all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums
 
 # Rules to create netcdf files
@@ -50,3 +53,21 @@ t_climatology_1.tar:
 s_climatology_1.tar:
 	wget ftp://ftp.nodc.noaa.gov/pub/WOA05/DATA/salinity/grid/$@
 	touch -m -t 200606200000 $@
+
+# Rule to obtain seawater python package (EOS-80)
+pkg/seawater: pkg/$(SW)
+	(cd $< ; python setup.py build -b ../)
+pkg/seawater-%: pkg/seawater-%.tar.gz
+	(cd pkg ; tar zvxf $(<F))
+pkg/seawater-%.tar.gz:
+	@mkdir -p pkg
+	cd pkg; wget https://pypi.python.org/packages/source/s/seawater/$(@F)
+
+# Rule to obtain Gibbs Sea Water python package (TEOS-10)
+pkg/gsw: pkg/$(GSW)
+	(cd $< ; python setup.py build -b ../)
+pkg/gsw-%: pkg/gsw-%.tar.gz
+	(cd pkg ; tar zvxf $(<F))
+pkg/gsw-%.tar.gz:
+	@mkdir -p pkg
+	cd pkg; wget https://pypi.python.org/packages/source/g/gsw/$(@F)

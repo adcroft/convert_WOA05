@@ -1,6 +1,8 @@
-# Download climatology files
+# Downloaded climatology files
 *.tar
 # Unpacked ascii climatology files
 ascii
 # Converted netcdf files
 netcdf
+# Downloaded python packages
+pkg

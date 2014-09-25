@@ -35,6 +35,7 @@ README.md | This file
 Makefile | The Makefile that governs the work-flow
 ncmd5.py | A tool to md5sum each variable in a netcdf file
 WOA05_to_netcdf.py* | A tool to read WOA05 ascii data and write it to a netcdf file
+temp2ptemp.py | A tool to derive potential temperature from temperature and salinity
 ascii.md5sums | The md5 sums of the unpacked ascii data
 netcdf.md5sums | The md5 sums of the variable data in the netcdf files
 netcdfmeta.md5sums | The md5 sums of the CDL files (meta-information of the netcdf files)
@@ -43,9 +44,10 @@ netcdfmeta.md5sums | The md5 sums of the CDL files (meta-information of the netc
 
 File/directory | Purpose
 --- | ---
+*_climatology_1.tar | climatology files downloaded from NOAA-NODC
 ascii/ | Unpacked ascii data
 netcdf/ | Will contain the converted data in netcdf files, as well as the CDL of meta-information
-*_climatology_1.tar | climatology files downloaded from NOAA-NODC
+pkg/ | A location for installing python packages
 
 # Requirements
 
