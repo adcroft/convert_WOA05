@@ -6,3 +6,5 @@ ascii
 netcdf
 # Downloaded python packages
 pkg
+# Derived data
+derived

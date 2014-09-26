@@ -7,15 +7,23 @@
 #   make
 
 # Lists of: variables (V), time-periods (TP), file types (TP), grid resolutions (G)
-V = t s
-TP = 00 01 02 03 04 05 06 07 08 09 10 11 12
+V = t s # (t)emperature, (s)alinity, (pt) potential temperature
+TP = 00 01 02 03 04 05 06 07 08 09 10 11 12 # (00) Annual mean, (01-12) Jan-Fec, (13-16) Seasons
 FT = an
 G = 1
 
 SW = seawater-3.3.2
 GSW = gsw-3.0.3
 
-all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums
+all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums derived.md5sums
+
+# Rules to derive potential temperature data
+derived.md5sums: $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), derived/$(v)$(tp)$(ft)$(G).nc ) ) )
+	(cd derived; ../ncmd5.py *.nc) > $@
+
+derived/pt%.nc: netcdf/t%.nc netcdf/s%.nc
+	@mkdir -p derived
+	./temp2ptemp.py $^ $@
 
 # Rules to create netcdf files
 netcdf.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), netcdf/$(v)$(tp)$(ft)$(G).nc ) ) )
