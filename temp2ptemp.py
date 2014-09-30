@@ -49,7 +49,15 @@ def writeNetcdf(tFile, sFile, outFile):
   for k in range(depth.shape[0]):
     T = tf.variables['temperature'][k]       # Read in-situ temperature (deg C)
     Sp = sf.variables['salinity'][k]         # Read practical salinity (psu)
+    # Using depth in meters as pressure in dbars seems to be a common approximation
     ptemp[k] = seawater.eos80.ptmp(Sp, T, depth[k])
+    # This is a test of sensitivity to the above approximation: rms differences
+    # of order 1.8e-3 degC. 
+    # ptemp[k] = seawater.eos80.ptmp(Sp, T, depth[k]*9.81*1035./1.e4)
+    # The following is the EOS80 way and has an rms difference with the ptmp(S,T,z)
+    # approximation of 1.3e-3
+    # p = seawater.eos80.pres( depth[k], lat )
+    # ptemp[k] = seawater.eos80.ptmp(Sp, T, (p.T + 0.*Sp.T).T)
 
   rg = netCDF4.Dataset(outFile, 'w', format='NETCDF4')
 
