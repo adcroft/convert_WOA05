@@ -54,6 +54,7 @@ ascii/ | Unpacked ascii data
 derived/ | Will contained derived data such as potential temperature
 netcdf/ | Will contain the converted data in netcdf files, as well as the CDL of meta-information
 pkg/ | A location for installing python packages
+final/ | The location of final netcdf files
 
 # Requirements
 

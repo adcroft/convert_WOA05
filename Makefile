@@ -17,6 +17,16 @@ GSW = gsw-3.0.3
 
 all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums derived.md5sums
 
+# Rules to combine data into single files
+final/WOA05_ptemp_monthly.nc: derived.md5sums
+	@mkdir -p final
+	./concatenate_data.py derived/pt{0[1-9],1[0-2]}*.nc -o $@
+	./compare2netcdf.py $@ ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
+final/WOA05_salt_monthly.nc: netcdf.md5sums
+	@mkdir -p final
+	./concatenate_data.py netcdf/s{0[1-9],1[0-2]}*.nc -o $@
+	./compare2netcdf.py $@ salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
+
 # Rules to derive potential temperature data
 derived.md5sums: $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), derived/$(v)$(tp)$(ft)$(G).nc ) ) )
 	(cd derived; ../ncmd5.py *.nc) > $@

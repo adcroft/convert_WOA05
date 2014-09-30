@@ -8,3 +8,5 @@ netcdf
 pkg
 # Derived data
 derived
+# Final netcdf files
+final
