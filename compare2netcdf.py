@@ -43,7 +43,7 @@ def compareNetcdfFiles(file1, var1, file2, var2):
     outliers = numpy.extract(numpy.abs(c).filled(0.) > thres, c)
     c2 = numpy.ma.masked_greater(numpy.abs(c), thres)
     rms2 = math.sqrt( numpy.mean( c2*c2 ) )
-    print 'rmsd=%12.5e '%rms2,lbl1,lbl2,
+    print 'rmsd=%12.5e meand=%12.5e'%(rms2,numpy.mean(c2)),lbl1,lbl2,
     if len(outliers): print len(outliers),'outliers:',outliers
     else: print
 
