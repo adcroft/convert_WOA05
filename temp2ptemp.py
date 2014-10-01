@@ -73,18 +73,38 @@ def writeNetcdf(tFile, sFile, outFile):
   vData = rg.createVariable('ptemp','f4',('depth','lat','lon'))
 
   # netCDF attributes
-  rg.source = 'http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html'
-  vLon.name = 'Longitude'
-  vLon.units = 'degrees east'
-  vLat.name = 'Latitude'
-  vLat.units = 'degrees north'
-  vDepth.name = 'Depth'
-  vDepth.units = 'm'
-  vData.definition = 'Potential temperature'
-  vData.units = 'degree Celsius'
+  rg.source      = 'http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html'
+  rg.Conventions = 'CF-1.4'
+  rg.title       = 'World Ocean Atlas 2005'
+  rg.reference   = 'ftp://ftp.nodc.noaa.gov/pub/WOA05/DOC/woa05documentation.pdf'
+
+  vLon.long_name     = 'Longitude'
+  vLon.standard_name = 'longitude'
+  vLon.units         = 'degrees east'
+  vLon.axis          = 'X'
+  vLon.description   = 'Longitude Range: 0 to 360 degrees with 0 at Greenwich Meridian and increasing towards the east.'
+
+  vLat.long_name     = 'Latitude'
+  vLat.standard_name = 'latitude'
+  vLat.units         = 'degrees north'
+  vLat.axis          = 'Y'
+  vLat.description   = 'Latitude Range: -90 to 90 degrees with 0 at the Equator and increasing towards the north.'
+
+  vDepth.long_name     = 'Depth'
+  vDepth.standard_name = 'depth'
+  vDepth.units         = 'm'
+  vDepth.axis          = 'Z'
+  vDepth.positive      = 'down'
+  vDepth.description   = 'Standard depth levels'
+
+  vData.long_name     = 'Objectively Analyzed Climatology of Potential temperature'
+  vData.standard_name = 'sea_water_potential_temperature'
+  vData.definition    = 'Potential temperature reference to 0 dbars'
+  vData.units         = 'degree Celsius'
   vData.missing_value = -99.9999
-  vData.documentation = 'n/a'
-  vData.notes = 'Converted using EOS80 with pressure obtained using seawater.eos80.pres(depth,lat).'
+ #vData.references    = 'Locarnini, R. A., A. V. Mishonov, J. I. Antonov, T. P. Boyer, and H. E. Garcia, 2006. World Ocean Atlas 2005, Volume 1: Temperature. S. Levitus, Ed. NOAA Atlas NESDIS 61, U.S. Government Printing Office, Washington, D.C., 182 pp.'
+ #vData.documentation = 'ftp://ftp.nodc.noaa.gov/pub/WOA05/DOC/woa05_temperature_final.pdf'
+  vData.notes         = 'Converted using EOS80 with pressure obtained using seawater.eos80.pres(depth,lat) (EOS80).'
 
   # Write the data
   vLon[:] = lon
