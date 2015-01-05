@@ -23,22 +23,27 @@ ASCII = ascii
 CONVERTED = netcdf
 # Directory into which to place derived netcdf data
 DERIVED = derived
+# Directory into which to place final netcdf data
+FINAL = final
 # Directory to install python packages
 PYTHON_PACKAGES = pkg
 
-all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums derived.md5sums
+all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums derived.md5sums final.md5sums
 
 # Rules to combine data into single files
-final/WOA05_ptemp_monthly.nc: derived.md5sums
-	@mkdir -p final
+final.md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc
+	(cd $(DERIVED); $(CURDIR)/ncmd5.py *.nc) > $@
+
+$(FINAL)/WOA05_ptemp_monthly.nc: derived.md5sums
+	@mkdir -p $(FINAL)
 	./concatenate_data.py $(DERIVED)/pt{0[1-9],1[0-2]}*.nc -o $@
-final/WOA05_salt_monthly.nc: netcdf.md5sums
-	@mkdir -p final
+$(FINAL)/WOA05_salt_monthly.nc: netcdf.md5sums
+	@mkdir -p $(FINAL)
 	./concatenate_data.py $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -o $@
 
-compare_t: final/WOA05_ptemp_monthly.nc
+compare_t: $(FINAL)/WOA05_ptemp_monthly.nc
 	./compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
-compare_s: final/WOA05_salt_monthly.nc
+compare_s: $(FINAL)/WOA05_salt_monthly.nc
 	./compare2netcdf.py $< salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
 
 # Rules to derive potential temperature data
