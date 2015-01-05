@@ -4,7 +4,7 @@ import numpy
 import netCDF4
 import argparse
 import os
-import sys; sys.path.append("./pkg/lib"); import seawater
+import seawater
 
 def parseCommandLine():
   """
