@@ -21,6 +21,8 @@ DOWNLOADED = .
 ASCII = ascii
 # Directory into which to place netcdf conversions of ascii data
 CONVERTED = netcdf
+# Directory into which to place derived netcdf data
+DERIVED = derived
 # Directory to install python packages
 PYTHON_PACKAGES = pkg
 
@@ -29,7 +31,7 @@ all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums derived.md5sums
 # Rules to combine data into single files
 final/WOA05_ptemp_monthly.nc: derived.md5sums
 	@mkdir -p final
-	./concatenate_data.py derived/pt{0[1-9],1[0-2]}*.nc -o $@
+	./concatenate_data.py $(DERIVED)/pt{0[1-9],1[0-2]}*.nc -o $@
 final/WOA05_salt_monthly.nc: netcdf.md5sums
 	@mkdir -p final
 	./concatenate_data.py $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -o $@
@@ -40,10 +42,10 @@ compare_s: final/WOA05_salt_monthly.nc
 	./compare2netcdf.py $< salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
 
 # Rules to derive potential temperature data
-derived.md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), derived/$(v)$(tp)$(ft)$(G).nc ) ) )
-	(cd derived; ../ncmd5.py *.nc) > $@
+derived.md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), $(DERIVED)/$(v)$(tp)$(ft)$(G).nc ) ) )
+	(cd $(DERIVED); $(CURDIR)/ncmd5.py *.nc) > $@
 
-derived/pt%.nc: $(CONVERTED)/t%.nc $(CONVERTED)/s%.nc
+$(DERIVED)/pt%.nc: $(CONVERTED)/t%.nc $(CONVERTED)/s%.nc
 	@mkdir -p derived
 	export PYTHONPATH=$(PYTHON_PACKAGES)/lib; ./temp2ptemp.py $^ $@
 
