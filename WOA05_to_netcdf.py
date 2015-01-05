@@ -61,7 +61,7 @@ def writeNetcdf(outFile, data, varId):
                        4000,4500,5000,5500,6000,6500,7000,7500,8000,8500,9000])
   depth = depth[:nk]
 
-  rg = netCDF4.Dataset(outFile, 'w', format='NETCDF4')
+  rg = netCDF4.Dataset(outFile, 'w', format='NETCDF3_CLASSIC')
 
   # netCDF dimensions
   dLon = rg.createDimension('lon', lon.shape[0])
