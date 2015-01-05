@@ -15,6 +15,10 @@ G = 1
 SW = seawater-3.3.2
 GSW = gsw-3.0.3
 
+# Directory to place the original tar files
+DOWNLOADED = .
+# Directory into which to unpack the tar files
+ASCII = ascii
 # Directory to install python packages
 PYTHON_PACKAGES = pkg
 
@@ -52,30 +56,32 @@ netcdfmeta.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT),
 	ncdump -h $< > $@
 
 # Rule to convert an ascii file into a netcdf file
-netcdf/%.nc: ascii/%
-	@mkdir -p netcdf
+netcdf/%.nc: $(ASCII)/%
+	@mkdir -p $(@D)
 	./WOA05_to_netcdf.py $< $@
 
 # This records the state of the unpacked ascii data
-ascii.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), ascii/$(v)$(tp)$(ft)$(G) ) ) )
-	(cd ascii; md5sum *) > $@
+$(ASCII)/md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
+	(cd $(@D); md5sum [a-zA-Z][0-9][0-9]*) > $@
 
 # Rules to unpack climatology tar files into ascii data
-ascii/t%: t_climatology_1.tar
-	@mkdir -p ascii
-	cd ascii; tar vxf ../$< $(@F).gz ; gunzip -f $(@F).gz ; touch $(@F)
+$(ASCII)/t%: $(DOWNLOADED)/t_climatology_1.tar
+	@mkdir -p $(@D)
+	tar vxf $< --directory=$(@D) $(@F).gz && gunzip -f $@.gz
 
-ascii/s%: s_climatology_1.tar
-	@mkdir -p ascii
-	cd ascii; tar vxf ../$< $(@F).gz ; gunzip -f $(@F).gz ; touch $(@F)
+$(ASCII)/s%: $(DOWNLOADED)/s_climatology_1.tar
+	@mkdir -p $(@D)
+	tar vxf $< --directory=$(@D) $(@F).gz && gunzip -f $@.gz
 
 # Rules to download climatologies from NODC
-t_climatology_1.tar:
-	wget ftp://ftp.nodc.noaa.gov/pub/WOA05/DATA/temperature/grid/$@
+$(DOWNLOADED)/t_climatology_1.tar:
+	@mkdir -p $(@D)
+	cd $(@D); wget ftp://ftp.nodc.noaa.gov/pub/WOA05/DATA/temperature/grid/$(@F)
 	touch -m -t 200606200000 $@
 
-s_climatology_1.tar:
-	wget ftp://ftp.nodc.noaa.gov/pub/WOA05/DATA/salinity/grid/$@
+$(DOWNLOADED)/s_climatology_1.tar:
+	@mkdir -p $(@D)
+	cd $(@D); wget ftp://ftp.nodc.noaa.gov/pub/WOA05/DATA/salinity/grid/$(@F)
 	touch -m -t 200606200000 $@
 
 # Rule to obtain seawater python package (EOS-80)
