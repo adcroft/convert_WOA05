@@ -19,6 +19,8 @@ GSW = gsw-3.0.3
 DOWNLOADED = .
 # Directory into which to unpack the tar files
 ASCII = ascii
+# Directory into which to place netcdf conversions of ascii data
+CONVERTED = netcdf
 # Directory to install python packages
 PYTHON_PACKAGES = pkg
 
@@ -30,7 +32,7 @@ final/WOA05_ptemp_monthly.nc: derived.md5sums
 	./concatenate_data.py derived/pt{0[1-9],1[0-2]}*.nc -o $@
 final/WOA05_salt_monthly.nc: netcdf.md5sums
 	@mkdir -p final
-	./concatenate_data.py netcdf/s{0[1-9],1[0-2]}*.nc -o $@
+	./concatenate_data.py $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -o $@
 
 compare_t: final/WOA05_ptemp_monthly.nc
 	./compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
@@ -41,28 +43,28 @@ compare_s: final/WOA05_salt_monthly.nc
 derived.md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), derived/$(v)$(tp)$(ft)$(G).nc ) ) )
 	(cd derived; ../ncmd5.py *.nc) > $@
 
-derived/pt%.nc: netcdf/t%.nc netcdf/s%.nc
+derived/pt%.nc: $(CONVERTED)/t%.nc $(CONVERTED)/s%.nc
 	@mkdir -p derived
 	export PYTHONPATH=$(PYTHON_PACKAGES)/lib; ./temp2ptemp.py $^ $@
 
 # Rules to create netcdf files
-netcdf.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), netcdf/$(v)$(tp)$(ft)$(G).nc ) ) )
-	(cd netcdf; ../ncmd5.py *.nc) > $@
+netcdf.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(CONVERTED)/$(v)$(tp)$(ft)$(G).nc ) ) )
+	(cd $(CONVERTED); $(CURDIR)/ncmd5.py *.nc) > $@
 
-netcdfmeta.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), netcdf/$(v)$(tp)$(ft)$(G).cdl ) ) )
-	(cd netcdf; md5sum *.cdl) > $@
+netcdfmeta.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(CONVERTED)/$(v)$(tp)$(ft)$(G).cdl ) ) )
+	(cd $(CONVERTED); md5sum *.cdl) > $@
 
 %.cdl: %.nc
 	ncdump -h $< > $@
 
 # Rule to convert an ascii file into a netcdf file
-netcdf/%.nc: $(ASCII)/%
+$(CONVERTED)/%.nc: $(ASCII)/%
 	@mkdir -p $(@D)
 	./WOA05_to_netcdf.py $< $@
 
 # This records the state of the unpacked ascii data
-$(ASCII)/md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
-	(cd $(@D); md5sum [a-zA-Z][0-9][0-9]*) > $@
+$(ASCII).md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
+	(cd $(ASCII); md5sum [a-zA-Z][0-9][0-9]*) > $@
 
 # Rules to unpack climatology tar files into ascii data
 $(ASCII)/t%: $(DOWNLOADED)/t_climatology_1.tar
