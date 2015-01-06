@@ -34,7 +34,7 @@ def concatenateFiles(inFiles, outFile):
   hi = netCDF4.Dataset(inFiles[0], 'r')
 
   # Create new file and record dimension
-  ho = netCDF4.Dataset(outFile, 'w', format='NETCDF4')
+  ho = netCDF4.Dataset(outFile, 'w', format='NETCDF3_CLASSIC')
   ho.createDimension('time',None)
   time = ho.createVariable('time','f4')
 
