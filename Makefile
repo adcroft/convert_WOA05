@@ -32,15 +32,19 @@ all: $(FINAL)/md5sums
 md5sums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL)/md5sums
 
 # Rules to combine data into single files
-$(FINAL)/md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc
+$(FINAL)/md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc $(FINAL)/WOA05_ptemp_annual.nc $(FINAL)/WOA05_salt_annual.nc
 	(cd $(@D); md5sum *.nc) > $@
 
-$(FINAL)/WOA05_ptemp_monthly.nc: $(DERIVED)/md5sums
+$(FINAL)/WOA05_ptemp_monthly.nc: $(FINAL) $(DERIVED)/md5sums
+	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc
+$(FINAL)/WOA05_ptemp_annual.nc: $(FINAL) $(DERIVED)/md5sums
+	python/concatenate_data.py -o $@ $(DERIVED)/pt00*.nc
+$(FINAL)/WOA05_salt_monthly.nc: $(FINAL) $(CONVERTED)/md5sums
+	python/concatenate_data.py -o $@ $(CONVERTED)/s{0[1-9],1[0-2]}*.nc
+$(FINAL)/WOA05_salt_annual.nc: $(FINAL) $(CONVERTED)/md5sums
+	python/concatenate_data.py -o $@ $(CONVERTED)/s00*.nc
+$(FINAL):
 	@mkdir -p $(FINAL)
-	python/concatenate_data.py $(DERIVED)/pt{0[1-9],1[0-2]}*.nc -o $@
-$(FINAL)/WOA05_salt_monthly.nc: $(CONVERTED)/md5sums
-	@mkdir -p $(FINAL)
-	python/concatenate_data.py $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -o $@
 
 compare_t: $(FINAL)/WOA05_ptemp_monthly.nc
 	python/compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
