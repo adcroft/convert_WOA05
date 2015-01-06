@@ -34,16 +34,16 @@ File | Purpose
 LICENSE | The MIT License
 Makefile | The Makefile that governs the work-flow
 README.md | This file
-WOA05_to_netcdf.py* | A tool to read WOA05 ascii data and write it to a netcdf file
-ncmd5.py | A tool to md5sum each variable in a netcdf file
-temp2ptemp.py | A tool to derive potential temperature from temperature and salinity
+python/WOA05_to_netcdf.py* | A tool to read WOA05 ascii data and write it to a netcdf file
+python/temp2ptemp.py | A tool to derive potential temperature from temperature and salinity
+python/concatenate_data.py | Concatenates multple monthly files into a single file
 
 Checksum file | Purpose
 --- | ---
-ascii.md5sums | The md5 sums of the unpacked ascii data
-derived.md5sums | The md5 sums of the derived variable data
-netcdf.md5sums | The md5 sums of the variable data in the netcdf files
-netcdfmeta.md5sums | The md5 sums of the CDL files (meta-information of the netcdf files)
+tmp/ascii/md5sums | The md5 sums of the unpacked ascii data
+tmp/converted/md5sums | The md5 sums of the netcdf files corresponding to the ascii data
+tmp/derived/md5sums | The md5 sums of the derived data
+final/md5sums | The md5 sums of the final netcdf files
 
 # Results
 

@@ -37,15 +37,15 @@ $(FINAL)/md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc
 
 $(FINAL)/WOA05_ptemp_monthly.nc: $(DERIVED)/md5sums
 	@mkdir -p $(FINAL)
-	./concatenate_data.py $(DERIVED)/pt{0[1-9],1[0-2]}*.nc -o $@
+	python/concatenate_data.py $(DERIVED)/pt{0[1-9],1[0-2]}*.nc -o $@
 $(FINAL)/WOA05_salt_monthly.nc: $(CONVERTED)/md5sums
 	@mkdir -p $(FINAL)
-	./concatenate_data.py $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -o $@
+	python/concatenate_data.py $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -o $@
 
 compare_t: $(FINAL)/WOA05_ptemp_monthly.nc
-	./compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
+	python/compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
 compare_s: $(FINAL)/WOA05_salt_monthly.nc
-	./compare2netcdf.py $< salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
+	python/compare2netcdf.py $< salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
 
 # Rules to derive potential temperature data
 $(DERIVED)/md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), $(DERIVED)/$(v)$(tp)$(ft)$(G).nc ) ) )
@@ -53,7 +53,7 @@ $(DERIVED)/md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach t
 
 $(DERIVED)/pt%.nc: $(CONVERTED)/t%.nc $(CONVERTED)/s%.nc
 	@mkdir -p $(DERIVED)
-	export PYTHONPATH=$(PYTHON_PACKAGES)/lib; ./temp2ptemp.py $^ $@
+	export PYTHONPATH=$(PYTHON_PACKAGES)/lib; python/temp2ptemp.py $^ $@
 
 # Rules to create netcdf files
 $(CONVERTED)/md5sums: $(ASCII)/md5sums $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(CONVERTED)/$(v)$(tp)$(ft)$(G).nc ) ) )
@@ -65,7 +65,7 @@ $(CONVERTED)/md5sums: $(ASCII)/md5sums $(foreach v, $(V), $(foreach tp, $(TP), $
 # Rule to convert an ascii file into a netcdf file
 $(CONVERTED)/%.nc: $(ASCII)/%
 	@mkdir -p $(@D)
-	./WOA05_to_netcdf.py $< $@
+	python/WOA05_to_netcdf.py $< $@
 
 # This records the state of the unpacked ascii data
 $(ASCII)/md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
