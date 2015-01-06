@@ -16,19 +16,19 @@ SW = seawater-3.3.2
 GSW = gsw-3.0.3
 
 # Directory to place the original tar files
-DOWNLOADED = .
+DOWNLOADED = tmp
 # Directory into which to unpack the tar files
-ASCII = ascii
+ASCII = tmp/ascii
 # Directory into which to place netcdf conversions of ascii data
-CONVERTED = netcdf
+CONVERTED = tmp/converted
 # Directory into which to place derived netcdf data
-DERIVED = derived
+DERIVED = tmp/derived
 # Directory into which to place final netcdf data
 FINAL = final
 # Directory to install python packages
-PYTHON_PACKAGES = pkg
+PYTHON_PACKAGES = tmp/pkg
 
-all: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums derived.md5sums final.md5sums
+all: final.md5sums
 
 # Rules to combine data into single files
 final.md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc
@@ -51,7 +51,7 @@ derived.md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach tp, 
 	(cd $(DERIVED); $(CURDIR)/ncmd5.py *.nc) > $@
 
 $(DERIVED)/pt%.nc: $(CONVERTED)/t%.nc $(CONVERTED)/s%.nc
-	@mkdir -p derived
+	@mkdir -p $(DERIVED)
 	export PYTHONPATH=$(PYTHON_PACKAGES)/lib; ./temp2ptemp.py $^ $@
 
 # Rules to create netcdf files
@@ -70,7 +70,7 @@ $(CONVERTED)/%.nc: $(ASCII)/%
 	./WOA05_to_netcdf.py $< $@
 
 # This records the state of the unpacked ascii data
-$(ASCII).md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
+ascii.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
 	(cd $(ASCII); md5sum [a-zA-Z][0-9][0-9]*) > $@
 
 # Rules to unpack climatology tar files into ascii data

@@ -59,7 +59,7 @@ def writeNetcdf(tFile, sFile, outFile):
     # p = seawater.eos80.pres( depth[k], lat )
     # ptemp[k] = seawater.eos80.ptmp(Sp, T, (p.T + 0.*Sp.T).T)
 
-  rg = netCDF4.Dataset(outFile, 'w', format='NETCDF4')
+  rg = netCDF4.Dataset(outFile, 'w', format='NETCDF3_CLASSIC')
 
   # netCDF dimensions
   dLon = rg.createDimension('lon', lon.shape[0])

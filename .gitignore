@@ -1,12 +1,6 @@
-# Downloaded climatology files
-*.tar
-# Unpacked ascii climatology files
-ascii
-# Converted netcdf files
-netcdf
+# Work space
+tmp
 # Downloaded python packages
 pkg
-# Derived data
-derived
 # Final netcdf files
 final
