@@ -28,16 +28,20 @@ FINAL = final
 # Directory to install python packages
 PYTHON_PACKAGES = tmp/pkg
 
-all: final.md5sums
+all: $(FINAL)/md5sums
+md5sums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL)/md5sums
+oldsums: ascii.md5sums netcdf.md5sums netcdfmeta.md5sums derived.md5sums final.md5sums
 
 # Rules to combine data into single files
+$(FINAL)/md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc
+	(cd $(@D); md5sum *.nc) > $@
 final.md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc
 	(cd $(FINAL); $(CURDIR)/ncmd5.py *.nc) > $@
 
-$(FINAL)/WOA05_ptemp_monthly.nc: derived.md5sums
+$(FINAL)/WOA05_ptemp_monthly.nc: $(DERIVED)/md5sums
 	@mkdir -p $(FINAL)
 	./concatenate_data.py $(DERIVED)/pt{0[1-9],1[0-2]}*.nc -o $@
-$(FINAL)/WOA05_salt_monthly.nc: netcdf.md5sums
+$(FINAL)/WOA05_salt_monthly.nc: $(CONVERTED)/md5sums
 	@mkdir -p $(FINAL)
 	./concatenate_data.py $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -o $@
 
@@ -47,6 +51,8 @@ compare_s: $(FINAL)/WOA05_salt_monthly.nc
 	./compare2netcdf.py $< salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
 
 # Rules to derive potential temperature data
+$(DERIVED)/md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), $(DERIVED)/$(v)$(tp)$(ft)$(G).nc ) ) )
+	(cd $(@D); md5sum *.nc) > $@
 derived.md5sums: $(PYTHON_PACKAGES)/lib/seawater $(foreach v, pt, $(foreach tp, $(TP), $(foreach ft, $(FT), $(DERIVED)/$(v)$(tp)$(ft)$(G).nc ) ) )
 	(cd $(DERIVED); $(CURDIR)/ncmd5.py *.nc) > $@
 
@@ -55,6 +61,8 @@ $(DERIVED)/pt%.nc: $(CONVERTED)/t%.nc $(CONVERTED)/s%.nc
 	export PYTHONPATH=$(PYTHON_PACKAGES)/lib; ./temp2ptemp.py $^ $@
 
 # Rules to create netcdf files
+$(CONVERTED)/md5sums: $(ASCII)/md5sums $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(CONVERTED)/$(v)$(tp)$(ft)$(G).nc ) ) )
+	(cd $(@D); md5sum *.nc) > $@
 netcdf.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(CONVERTED)/$(v)$(tp)$(ft)$(G).nc ) ) )
 	(cd $(CONVERTED); $(CURDIR)/ncmd5.py *.nc) > $@
 
@@ -70,6 +78,8 @@ $(CONVERTED)/%.nc: $(ASCII)/%
 	./WOA05_to_netcdf.py $< $@
 
 # This records the state of the unpacked ascii data
+$(ASCII)/md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
+	(cd $(ASCII); md5sum [a-zA-Z][0-9][0-9]*) > $@
 ascii.md5sums: $(foreach v, $(V), $(foreach tp, $(TP), $(foreach ft, $(FT), $(ASCII)/$(v)$(tp)$(ft)$(G) ) ) )
 	(cd $(ASCII); md5sum [a-zA-Z][0-9][0-9]*) > $@
 
