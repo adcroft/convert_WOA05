@@ -32,7 +32,7 @@ all: final.md5sums
 
 # Rules to combine data into single files
 final.md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc
-	(cd $(DERIVED); $(CURDIR)/ncmd5.py *.nc) > $@
+	(cd $(FINAL); $(CURDIR)/ncmd5.py *.nc) > $@
 
 $(FINAL)/WOA05_ptemp_monthly.nc: derived.md5sums
 	@mkdir -p $(FINAL)
