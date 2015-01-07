@@ -34,27 +34,27 @@ all: $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
 md5sums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
 
 # Rules to combine monthly data into single files
-$(FINAL_MONTHLY)/md5sums: $(FINAL_MONTHLY)/WOA05_ptemp_monthly.nc $(FINAL_MONTHLY)/WOA05_salt_monthly.nc
+$(FINAL_MONTHLY)/md5sums: $(FINAL_MONTHLY)/ptemp_WOA05_ann.nc $(FINAL_MONTHLY)/salt_WOA05_mon.nc
 	(cd $(@D); md5sum *.nc) > $@
-$(FINAL_MONTHLY)/WOA05_ptemp_monthly.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
+$(FINAL_MONTHLY)/ptemp_WOA05_ann.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
 	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc
-$(FINAL_MONTHLY)/WOA05_salt_monthly.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
+$(FINAL_MONTHLY)/salt_WOA05_mon.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s{0[1-9],1[0-2]}*.nc
 
 # Rules to create annual data files
-$(FINAL_ANNUAL)/md5sums: $(FINAL_ANNUAL)/WOA05_ptemp_annual.nc $(FINAL_ANNUAL)/WOA05_salt_annual.nc
+$(FINAL_ANNUAL)/md5sums: $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc $(FINAL_ANNUAL)/salt_WOA05_ann.nc
 	(cd $(@D); md5sum *.nc) > $@
-$(FINAL_ANNUAL)/WOA05_ptemp_annual.nc: $(FINAL_ANNUAL) $(DERIVED)/md5sums
+$(FINAL_ANNUAL)/ptemp_WOA05_ann.nc: $(FINAL_ANNUAL) $(DERIVED)/md5sums
 	python/concatenate_data.py -o $@ $(DERIVED)/pt00*.nc
-$(FINAL_ANNUAL)/WOA05_salt_annual.nc: $(FINAL_ANNUAL) $(CONVERTED)/md5sums
+$(FINAL_ANNUAL)/salt_WOA05_ann.nc: $(FINAL_ANNUAL) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s00*.nc
 
 $(FINAL_ANNUAL) $(FINAL_MONTHLY):
 	@mkdir -p $@
 
-compare_t: $(FINAL)/WOA05_ptemp_monthly.nc
+compare_t: $(FINAL_MONTHLY)/ptemp_WOA05_ann.nc
 	python/compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
-compare_s: $(FINAL)/WOA05_salt_monthly.nc
+compare_s: $(FINAL_MONTHLY)/salt_WOA05_mon.nc
 	python/compare2netcdf.py $< salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
 
 # Rules to derive potential temperature data
