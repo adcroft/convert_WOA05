@@ -33,19 +33,19 @@ PYTHON_PACKAGES = tmp/pkg
 all: md5sums
 allsums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
 
-md5sums: $(FINAL_MONTHLY)/ptemp_WOA05_mon.nc $(FINAL_MONTHLY)/salt_WOA05_mon.nc $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc $(FINAL_ANNUAL)/salt_WOA05_ann.nc
+md5sums: $(FINAL_MONTHLY)/ptemp_WOA05_mon.nc $(FINAL_MONTHLY)/salinity_WOA05_mon.nc $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc $(FINAL_ANNUAL)/salinity_WOA05_ann.nc
 	md5sum $^ > $@
 
 # Rules to combine monthly data into single files
 $(FINAL_MONTHLY)/ptemp_WOA05_mon.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
 	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc
-$(FINAL_MONTHLY)/salt_WOA05_mon.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
+$(FINAL_MONTHLY)/salinity_WOA05_mon.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s{0[1-9],1[0-2]}*.nc
 
 # Rules to create annual data files
 $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc: $(FINAL_ANNUAL) $(DERIVED)/md5sums
 	python/concatenate_data.py -o $@ $(DERIVED)/pt00*.nc
-$(FINAL_ANNUAL)/salt_WOA05_ann.nc: $(FINAL_ANNUAL) $(CONVERTED)/md5sums
+$(FINAL_ANNUAL)/salinity_WOA05_ann.nc: $(FINAL_ANNUAL) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s00*.nc
 
 $(FINAL_ANNUAL) $(FINAL_MONTHLY):
@@ -53,7 +53,7 @@ $(FINAL_ANNUAL) $(FINAL_MONTHLY):
 
 compare_t: $(FINAL_MONTHLY)/ptemp_WOA05_ann.nc
 	python/compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP
-compare_s: $(FINAL_MONTHLY)/salt_WOA05_mon.nc
+compare_s: $(FINAL_MONTHLY)/salinity_WOA05_mon.nc
 	python/compare2netcdf.py $< salinity /archive/gold/datasets/obs/WOA05_pottemp_salt.nc SALT
 
 # Rules to derive potential temperature data
