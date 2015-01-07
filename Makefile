@@ -118,3 +118,7 @@ $(PYTHON_PACKAGES)/gsw-%: $(PYTHON_PACKAGES)/gsw-%.tar.gz
 $(PYTHON_PACKAGES)/gsw-%.tar.gz:
 	@mkdir -p $(@D)
 	cd $(@D); wget https://pypi.python.org/packages/source/g/gsw/$(@F)
+
+# Rule to clean all intermediate files (not downloaded or final data)
+clean:
+	rm -rf $(DERIVED) $(ASCII) $(CONVERTED) $(PYTHON_PACKAGES)/lib  $(PYTHON_PACKAGES)/$(SW) 
