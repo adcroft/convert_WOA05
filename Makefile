@@ -23,28 +23,34 @@ ASCII = tmp/ascii
 CONVERTED = tmp/converted
 # Directory into which to place derived netcdf data
 DERIVED = tmp/derived
-# Directory into which to place final netcdf data
-FINAL = final
+# Directory into which to place final netcdf monthly data
+FINAL_MONTHLY = monthly
+# Directory into which to place final netcdf annual data
+FINAL_ANNUAL = annual
 # Directory to install python packages
 PYTHON_PACKAGES = tmp/pkg
 
-all: $(FINAL)/md5sums
-md5sums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL)/md5sums
+all: $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
+md5sums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
 
-# Rules to combine data into single files
-$(FINAL)/md5sums: $(FINAL)/WOA05_ptemp_monthly.nc $(FINAL)/WOA05_salt_monthly.nc $(FINAL)/WOA05_ptemp_annual.nc $(FINAL)/WOA05_salt_annual.nc
+# Rules to combine monthly data into single files
+$(FINAL_MONTHLY)/md5sums: $(FINAL_MONTHLY)/WOA05_ptemp_monthly.nc $(FINAL_MONTHLY)/WOA05_salt_monthly.nc
 	(cd $(@D); md5sum *.nc) > $@
-
-$(FINAL)/WOA05_ptemp_monthly.nc: $(FINAL) $(DERIVED)/md5sums
+$(FINAL_MONTHLY)/WOA05_ptemp_monthly.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
 	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc
-$(FINAL)/WOA05_ptemp_annual.nc: $(FINAL) $(DERIVED)/md5sums
-	python/concatenate_data.py -o $@ $(DERIVED)/pt00*.nc
-$(FINAL)/WOA05_salt_monthly.nc: $(FINAL) $(CONVERTED)/md5sums
+$(FINAL_MONTHLY)/WOA05_salt_monthly.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s{0[1-9],1[0-2]}*.nc
-$(FINAL)/WOA05_salt_annual.nc: $(FINAL) $(CONVERTED)/md5sums
+
+# Rules to create annual data files
+$(FINAL_ANNUAL)/md5sums: $(FINAL_ANNUAL)/WOA05_ptemp_annual.nc $(FINAL_ANNUAL)/WOA05_salt_annual.nc
+	(cd $(@D); md5sum *.nc) > $@
+$(FINAL_ANNUAL)/WOA05_ptemp_annual.nc: $(FINAL_ANNUAL) $(DERIVED)/md5sums
+	python/concatenate_data.py -o $@ $(DERIVED)/pt00*.nc
+$(FINAL_ANNUAL)/WOA05_salt_annual.nc: $(FINAL_ANNUAL) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s00*.nc
-$(FINAL):
-	@mkdir -p $(FINAL)
+
+$(FINAL_ANNUAL) $(FINAL_MONTHLY):
+	@mkdir -p $@
 
 compare_t: $(FINAL)/WOA05_ptemp_monthly.nc
 	python/compare2netcdf.py $< ptemp /archive/gold/datasets/obs/WOA05_pottemp_salt.nc PTEMP

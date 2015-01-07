@@ -1,6 +1,4 @@
 # Work space
 tmp
-# Downloaded python packages
-pkg
-# Final netcdf files
-final
+# Ignore netcdf files
+*.nc
