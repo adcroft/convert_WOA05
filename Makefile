@@ -24,26 +24,25 @@ CONVERTED = tmp/converted
 # Directory into which to place derived netcdf data
 DERIVED = tmp/derived
 # Directory into which to place final netcdf monthly data
-FINAL_MONTHLY = monthly
+FINAL_MONTHLY = .
 # Directory into which to place final netcdf annual data
-FINAL_ANNUAL = annual
+FINAL_ANNUAL = .
 # Directory to install python packages
 PYTHON_PACKAGES = tmp/pkg
 
-all: $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
-md5sums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
+all: md5sums
+allsums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
+
+md5sums: $(FINAL_MONTHLY)/ptemp_WOA05_mon.nc $(FINAL_MONTHLY)/salt_WOA05_mon.nc $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc $(FINAL_ANNUAL)/salt_WOA05_ann.nc
+	md5sum $^ > $@
 
 # Rules to combine monthly data into single files
-$(FINAL_MONTHLY)/md5sums: $(FINAL_MONTHLY)/ptemp_WOA05_ann.nc $(FINAL_MONTHLY)/salt_WOA05_mon.nc
-	(cd $(@D); md5sum *.nc) > $@
-$(FINAL_MONTHLY)/ptemp_WOA05_ann.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
+$(FINAL_MONTHLY)/ptemp_WOA05_mon.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
 	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc
 $(FINAL_MONTHLY)/salt_WOA05_mon.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s{0[1-9],1[0-2]}*.nc
 
 # Rules to create annual data files
-$(FINAL_ANNUAL)/md5sums: $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc $(FINAL_ANNUAL)/salt_WOA05_ann.nc
-	(cd $(@D); md5sum *.nc) > $@
 $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc: $(FINAL_ANNUAL) $(DERIVED)/md5sums
 	python/concatenate_data.py -o $@ $(DERIVED)/pt00*.nc
 $(FINAL_ANNUAL)/salt_WOA05_ann.nc: $(FINAL_ANNUAL) $(CONVERTED)/md5sums
