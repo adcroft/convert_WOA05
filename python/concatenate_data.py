@@ -36,7 +36,7 @@ def concatenateFiles(inFiles, outFile):
   # Create new file and record dimension
   ho = netCDF4.Dataset(outFile, 'w', format='NETCDF3_CLASSIC')
   ho.createDimension('time',None)
-  time = ho.createVariable('time','f4')
+  time = ho.createVariable('time','f4',['time'])
 
   # Copy dimensions
   for d in hi.dimensions:
@@ -63,7 +63,7 @@ def concatenateFiles(inFiles, outFile):
   for n,f in zip(range(len(inFiles)),inFiles):
     hi = netCDF4.Dataset(f, 'r')
     for v in ho.variables:
-      if 'time' in ho.variables[v].dimensions:
+      if 'time' in ho.variables[v].dimensions and len(ho.variables[v].dimensions)>1:
         print ho.variables[v].shape, hi.variables[v].shape,n
         ho.variables[v][n,:] = hi.variables[v][:]
     ho.variables['time'][n] = n
