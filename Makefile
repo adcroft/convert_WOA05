@@ -55,9 +55,9 @@ $(FINAL_MONTHLY)/salinity_WOA05_mon_24lvl.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5s
 
 # Rules to create annual data files
 $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc: $(FINAL_ANNUAL) $(DERIVED)/md5sums
-	python/concatenate_data.py -o $@ $(DERIVED)/pt00*.nc
+	cp $(DERIVED)/pt00an1.nc $@
 $(FINAL_ANNUAL)/salinity_WOA05_ann.nc: $(FINAL_ANNUAL) $(CONVERTED)/md5sums
-	python/concatenate_data.py -o $@ $(CONVERTED)/s00*.nc
+	cp $(CONVERTED)/s00an1.nc $@
 
 $(FINAL_ANNUAL) $(FINAL_MONTHLY):
 	@mkdir -p $@

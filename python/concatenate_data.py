@@ -42,6 +42,11 @@ def concatenateFiles(inFiles, outFile, annualFile=None):
   ho = netCDF4.Dataset(outFile, 'w', format='NETCDF3_CLASSIC')
   ho.createDimension('time',None)
   time = ho.createVariable('time','f4',['time'])
+  time.setncattr('long_name','month_number')
+  time.setncattr('standard_name','month_number')
+  time.setncattr('units','Month number')
+  time.setncattr('axis','T')
+  time.setncattr('description','Number of month in annual cycle, 1-12.')
 
   # Copy dimensions
   for d in hi.dimensions:
