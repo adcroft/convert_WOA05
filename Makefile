@@ -7,9 +7,13 @@
 #   make
 
 # Lists of: variables (V), time-periods (TP), file types (TP), grid resolutions (G)
-V = t s # (t)emperature, (s)alinity, (pt) potential temperature
-TP = 00 01 02 03 04 05 06 07 08 09 10 11 12 # (00) Annual mean, (01-12) Jan-Fec, (13-16) Seasons
+# Variables: (t)emperature, (s)alinity, (pt) potential temperature
+V = t s
+# Time period: (00) Annual mean, (01-12) Jan-Fec, (13-16) Seasons
+TP = 00 01 02 03 04 05 06 07 08 09 10 11 12
+# File types: (an) Objectively analyzed climatology
 FT = an
+# Grid resolutions: (1) One-degree grid
 G = 1
 
 SW = seawater-3.3.2
