@@ -1,4 +1,6 @@
-6db0420cd3da2e3be61d19e9fd02f210  ptemp_WOA05_mon.nc
-3eb5dc08c75f6040a188a273de4f006e  salinity_WOA05_mon.nc
+6db0420cd3da2e3be61d19e9fd02f210  ptemp_WOA05_mon_24lvl.nc
+3eb5dc08c75f6040a188a273de4f006e  salinity_WOA05_mon_24lvl.nc
+edb15a1d99c9237ce71f18f43e90b310  ptemp_WOA05_mon.nc
+ac557cc125fbb759738f9d2a5bf0670b  salinity_WOA05_mon.nc
 5f8285d343a59eaafae09f928afd9bc8  ptemp_WOA05_ann.nc
 74c0776477432828c1784166879909e6  salinity_WOA05_ann.nc

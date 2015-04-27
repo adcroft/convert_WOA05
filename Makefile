@@ -37,13 +37,20 @@ PYTHON_PACKAGES = tmp/pkg
 all: md5sums
 allsums: $(ASCII)/md5sums $(CONVERTED)/md5sums $(DERIVED)/md5sums $(FINAL_MONTHLY)/md5sums $(FINAL_ANNUAL)/md5sums
 
-md5sums: $(FINAL_MONTHLY)/ptemp_WOA05_mon.nc $(FINAL_MONTHLY)/salinity_WOA05_mon.nc $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc $(FINAL_ANNUAL)/salinity_WOA05_ann.nc
+md5sums: $(FINAL_MONTHLY)/ptemp_WOA05_mon_24lvl.nc $(FINAL_MONTHLY)/salinity_WOA05_mon_24lvl.nc \
+         $(FINAL_MONTHLY)/ptemp_WOA05_mon.nc $(FINAL_MONTHLY)/salinity_WOA05_mon.nc \
+         $(FINAL_ANNUAL)/ptemp_WOA05_ann.nc $(FINAL_ANNUAL)/salinity_WOA05_ann.nc
 	md5sum $^ > $@
 
-# Rules to combine monthly data into single files
+# Rules to combine monthly data into single files deep-filled with annual climatology
 $(FINAL_MONTHLY)/ptemp_WOA05_mon.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
-	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc
+	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc -a $(DERIVED)/pt00*.nc
 $(FINAL_MONTHLY)/salinity_WOA05_mon.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
+	python/concatenate_data.py -o $@ $(CONVERTED)/s{0[1-9],1[0-2]}*.nc -a $(CONVERTED)/s00*.nc
+# Rules to combine monthly data into single files on original 24 vertical levels
+$(FINAL_MONTHLY)/ptemp_WOA05_mon_24lvl.nc: $(FINAL_MONTHLY) $(DERIVED)/md5sums
+	python/concatenate_data.py -o $@ $(DERIVED)/pt{0[1-9],1[0-2]}*.nc
+$(FINAL_MONTHLY)/salinity_WOA05_mon_24lvl.nc: $(FINAL_MONTHLY) $(CONVERTED)/md5sums
 	python/concatenate_data.py -o $@ $(CONVERTED)/s{0[1-9],1[0-2]}*.nc
 
 # Rules to create annual data files
