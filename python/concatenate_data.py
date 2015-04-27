@@ -66,7 +66,7 @@ def concatenateFiles(inFiles, outFile):
       if 'time' in ho.variables[v].dimensions and len(ho.variables[v].dimensions)>1:
         print ho.variables[v].shape, hi.variables[v].shape,n
         ho.variables[v][n,:] = hi.variables[v][:]
-    ho.variables['time'][n] = n
+    ho.variables['time'][n] = n+1
     hi.close()
 
   ho.close()
